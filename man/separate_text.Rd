@@ -34,7 +34,6 @@ separate_text(txt, "\\\\([A-Z]{3,6}s?\\\\)")
 separate_text(txt, c("hmu", "ybt", "yfe", "yfu"))
 # wrappers for separate_text with extra step to expand matched ranges
 separate_refs(txt)
-separate_genes(txt)
 separate_tags(txt, "YPO")
 
 }

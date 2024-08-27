@@ -15,7 +15,7 @@
 #' x <- c("carnivores", "bears", "polar", "grizzly", "cats", "tiger", "rodents")
 #' n <- c(1, 2, 3, 3, 2, 3, 1)
 #' path_string(x, n)
-#' @noRd
+#' @export
 
 path_string <- function(x, n) {
   n2 <- length(n)

@@ -22,7 +22,7 @@
 #' x
 #' repeat_sub(x)
 #' repeat_sub(x, "regulated", first = FALSE)
-#' @noRd
+#' @export
 
 repeat_sub <- function(x, column = "subheading", first = TRUE) {
   if (!is.data.frame(x)) {

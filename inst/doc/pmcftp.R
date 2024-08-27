@@ -1,15 +1,15 @@
-## ----setup, include = FALSE----------------------------------------------
+## ----setup, include = FALSE---------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "# "
 )
 
-## ----load----------------------------------------------------------------
+## ----load---------------------------------------------------------------------
 library(readr)
 pmcfile <- system.file("extdata/PMC6358576_PMC6358589.xml", package = "tidypmc")
 pmc <- read_lines(pmcfile)
 
-## ----startnode-----------------------------------------------------------
+## ----startnode----------------------------------------------------------------
 a1 <- grep("^<article ", pmc)
 head(a1)
 n <- length(a1)
@@ -36,7 +36,7 @@ for(i in seq_len(n)){
   txt1[[i]] <- pmc_text(doc)
 }
 
-## ----combine, echo=-1-----------------------------------------------------------------------------
+## ----combine, echo=-1, message=FALSE--------------------------------------------------------------
 options(width=100)
 library(dplyr)
 met <- bind_rows(met1)

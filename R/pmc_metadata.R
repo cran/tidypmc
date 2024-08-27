@@ -105,6 +105,11 @@ pmc_metadata <- function(doc) {
       doc, "//front//article-id[@pub-id-type='doi']"
     ))
     if (!is.na(doi)) z[["DOI"]] <- doi
+    ## PMID
+    pmid <- xml2::xml_text(xml2::xml_find_first(
+      doc,   "//front//article-id[@pub-id-type='pmid']"
+    ))
+    if (!is.na(pmid)) z[["PMID"]] <- pmid
     # Publisher
     x <- xml2::xml_text(xml2::xml_find_first(
       doc, "//front//journal-meta//publisher-name"

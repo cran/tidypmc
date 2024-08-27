@@ -125,14 +125,9 @@ x
 filter(x, id == 8)
 ```
 
-`separate_genes` expands microbial gene operons like `hmsHFRS` into four separate genes.
 
-```{r separate_genes, echo=-1}
-options(width=100)
-separate_genes(txt)
-```
 
-Finally, `separate_tags` expands locus tag ranges.
+`separate_tags` expands locus tag ranges.
 
 
 ```{r locus_tags, echo=-1}

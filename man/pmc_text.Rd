@@ -4,10 +4,12 @@
 \alias{pmc_text}
 \title{Split section paragraphs into sentences}
 \usage{
-pmc_text(doc)
+pmc_text(doc, sentence = TRUE)
 }
 \arguments{
 \item{doc}{\code{xml_document} from PubMed Central}
+
+\item{sentence}{split paragraphs into sentences, default TRUE}
 }
 \value{
 a tibble with section, paragraph and sentence number and text

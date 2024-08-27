@@ -15,12 +15,6 @@ test_that("Separate refs", {
  expect_equal(a1, NULL)
 })
 
-test_that("Separate genes", {
- expect_is(separate_genes(txt), "tbl_df")
- a1 <- separate_genes(dplyr::filter(txt, section=="Conclusion"))
- expect_equal(a1, NULL)
-})
-
 test_that("Separate locus tags", {
  expect_is(separate_tags(txt, "YPO"), "tbl_df")
  a1 <- separate_tags(dplyr::filter(txt, section=="Abstract"), "YPO")

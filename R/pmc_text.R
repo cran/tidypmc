@@ -4,6 +4,7 @@
 #' sentences using \code{tokenize_sentences}
 #'
 #' @param doc \code{xml_document} from PubMed Central
+#' @param sentence split paragraphs into sentences, default TRUE
 #'
 #' @return a tibble with section, paragraph and sentence number and text
 #'
@@ -26,7 +27,7 @@
 #' dplyr::count(txt, section, sort = TRUE)
 #' @export
 
-pmc_text <- function(doc) {
+pmc_text <- function(doc, sentence=TRUE) {
   if (class(doc)[1] != "xml_document") {
     stop("doc should be an xml_document from PubMed Central")
   }
@@ -39,24 +40,36 @@ pmc_text <- function(doc) {
   ), trim = TRUE)
   if (!is.na(t1)) z[["Title"]] <- t1
   ## Abstract
+   ## add title to start of paragraph
+    ## Significance in PNAS, background, results, conclusion in BMC
+  at1 <- xml2::xml_find_all(doc2, "//abstract//title")
+  if(length(at1) >0) xml2::xml_text(at1) <- paste0(xml2::xml_text(at1), ": ")
   a1 <- xml2::xml_text(xml2::xml_find_all(
-    doc2, "//abstract[not(@abstract-type='summary')]//p"
+    doc2, "//abstract/*"
   ))
-  if (length(a1) > 0) z[["Abstract"]] <- a1
-
-  ## Author summary
-  author_sum <- xml2::xml_text(xml2::xml_find_all(
-    doc2, "//abstract[@abstract-type='summary']/title"
-  ))
-  if (length(author_sum) > 0) {
-    z[[author_sum]] <- xml2::xml_text(xml2::xml_find_all(
-      doc2, "//abstract[@abstract-type='summary']//p"
-    ))
+  if (length(a1) > 0){
+    ## titles outside <p>
+    n <- which( nchar(a1)< 20)
+     if(length(n) >0){
+        for (i in seq_along(n)){
+            a1[n[i] + 1] <- paste0(a1[n[i]],a1[n[i] + 1] )
+        }
+        a1 <- a1[-n]
+     }
+    ## drop link to supplement in BMC, other?
+    a1 <- grep("^Supplementary Information", a1, value=TRUE, invert=TRUE)
+    z[["Abstract"]] <- a1
   }
   if (length(z) == 0) {
     message("No title or abstract found. Not a PMC XML document?")
     x <- NULL
   } else {
+    ## check for editor and review comments in Elife
+    n <- xml2::xml_find_all(doc2, "//sub-article")
+    if (length(n) > 0) {
+      message("Note: removing reviewer comments in sub-article tags")
+      xml2::xml_remove(n)
+    }
     ## check for tables, figures, formula within <sec/p> tags
     n <- xml2::xml_find_all(doc2, "//sec/p/table-wrap")
     if (length(n) > 0) {
@@ -151,13 +164,20 @@ pmc_text <- function(doc) {
         }
       }
     }
-    x <- lapply(z, tokenizers::tokenize_sentences)
-    x1 <- lapply(x, function(y) dplyr::bind_rows(
+    ## split into sentences, need to update this code
+    if(sentence){
+      x <- lapply(z, tokenizers::tokenize_sentences)
+      x1 <- lapply(x, function(y) dplyr::bind_rows(
         lapply(y, function(z) if (length(z) > 0) {
             tibble::tibble(sentence = seq_along(z), text = z)
           }),
         .id = "paragraph"
-      ))
+       ))
+    }else{
+      ## combine paragraphs
+      x1 <- lapply(z, function(x)
+           tibble::enframe(unlist(x[x!=""]), "paragraph", "text"))
+    }
     x <- dplyr::bind_rows(x1, .id = "section")
     x <- dplyr::mutate(x, paragraph = as.integer(paragraph))
     # replace en dash, em dash, etc to separate ranges
